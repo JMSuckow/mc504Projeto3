@@ -151,13 +151,13 @@ void transfer(int fd,char* value, char* destination){
 int main (int argc, char* argv[]){
 	
 	int returnValue = 0;
-	char *file_name = "/dev/query";
+	char *file_name = "/dev/ATM";
    int fd;
    
    fd = open(file_name, O_RDWR);
     if (fd == -1){
         perror("App Open");
-        //return 2;
+        return 2;
     }
 	
 	if(argc == 1){
