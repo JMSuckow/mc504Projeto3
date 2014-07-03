@@ -13,11 +13,11 @@ Para a resolução foi escolhido a implementação de um cofre de dinheiro focad
 
 A fim de facilitar esta interação foi desenvolvido um programa para intermediar a relação viajante-cofre. A seguir encontra-se os comandos para se utilizar quando for necessário mexer no cofre.
 
-./app -u : Serve para destrancar (unlock) o cofre a fim de se usar as demais funcionalidades do mesmo. Será pedida a combinação do cofre.
-./app -l : Serve para trancar (lock) o cofre para que outras pessoas não possam mexer nele.
-./app -d : Serve para depositar certa quantia de dinheiro no cofre.
-./app -w : Serve para sacar (withdraw) certa quantia de dinheiro do cofre.
-./app -b : Serve para verificar o seu saldo (balance).
-./app -h : Ajuda caso esqueça alguma destas funções.
+./app -u : Serve para destrancar (unlock) o cofre a fim de se usar as demais funcionalidades do mesmo. Será pedida a combinação do cofre.<br/>
+./app -l : Serve para trancar (lock) o cofre para que outras pessoas não possam mexer nele.<br/>
+./app -d : Serve para depositar certa quantia de dinheiro no cofre.<br/>
+./app -w : Serve para sacar (withdraw) certa quantia de dinheiro do cofre.<br/>
+./app -b : Serve para verificar o seu saldo (balance).<br/>
+./app -h : Ajuda caso esqueça alguma destas funções.<br/>
 
 
