@@ -4,205 +4,248 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include "ATM.h"
-
-
-void login(int fd){
-	
-	if (ioctl(fd, ATM_IS_USING) == -1){
-
-		char user[10];
-		int password;
-		
-		printf("Entre com o usuário: ");
-		scanf ("%s", user);
-		printf("Entre com a senha: ");
-		scanf("%d", &password);
-			
-		account_user u;
-		
-		strcpy(u.login, user);
-		u.password = password;
-		
-		//printf("%s %d", u.login, u.password);
-		
-		if (ioctl(fd, ATM_AUTHENTICATE_ACCOUNT_USER, &u) == -1)
-	    {
-	        perror("query_apps ioctl set");
-	    }
+ 
+#include "cofre.h"
+ 
+ void abrirCofre(int fd)
+{
+    int v;
+ 	 
+ 	 printf("Qual a combinação do cofre: ");
+    scanf("%d", &v);
+    getchar();
+ 
+    if (ioctl(fd, ABRIR, &v) == -1)
+    {
+        perror("Erro na abertura do cofre");
     }
-	
+    
+ while(!cofreAberto(fd)){
+    printf("Tente Novamente: ");
+    scanf("%d", &v);
+    getchar();
+ 
+    if (ioctl(fd, ABRIR, &v) == -1)
+    {
+        perror("Erro na abertura do cofre");
+    }
+}
+}
+ 
+void deposito(int fd)
+{
+    int v;
+    cofre c;
+ 
+ if(!cofreAberto(fd)){
+ 	abrirCofre(fd);
+ }
+ 	 printf("Entre com os valóres depositados no cofre\n");
+ 
+    printf("Dólares: ");
+    scanf("%d", &v);
+    getchar();
+    c.dolar = v;
+    printf("Euros: ");
+    scanf("%d", &v);
+    getchar();
+    c.euro = v;
+    printf("Reais: ");
+    scanf("%d", &v);
+    getchar();
+    c.real = v;
+    printf("Libras: ");
+    scanf("%d", &v);
+    getchar();
+    c.libra = v;
+ 
+    if (ioctl(fd, DEPOSITAR, &c) == -1)
+    {
+        perror("Erro no depóstio");
+    }
+
+}
+
+void saque(int fd)
+{
+    int v;
+    cofre c;
+ 
+ if(!cofreAberto(fd)){
+ 	abrirCofre(fd);
+ } 
+ 	 printf("Entre com os valóres sacados do cofre\n");
+ 
+    printf("Dólares: ");
+    scanf("%d", &v);
+    getchar();
+    c.dolar = v;
+    printf("Euros: ");
+    scanf("%d", &v);
+    getchar();
+    c.euro = v;
+    printf("Reais: ");
+    scanf("%d", &v);
+    getchar();
+    c.real = v;
+    printf("Libras: ");
+    scanf("%d", &v);
+    getchar();
+    c.libra = v;
+ 
+    if (ioctl(fd, SACAR, &c) == -1)
+    {
+        perror("Erro no saque");
+    }
+}
+
+void ver_saldo(int fd)
+{
+    cofre c;
+ 
+ if(!cofreAberto(fd)){
+ 	abrirCofre(fd);
+ } 
+    if (ioctl(fd, SALDO, &c) == -1)
+    {
+        perror("Erro no saldo");
+    }
+    else
+    {
+        printf("Dólares : %d\n", c.dolar);
+        printf("Euros   : %d\n", c.euro);
+        printf("Reais   : %d\n", c.real);
+        printf("Libras  : %d\n", c.libra);
+
+    }
+}
+
+void trancarCofre(int fd)
+{
+ 
+ 	if(!cofreAberto(fd)){
+ 		printf("O cofre já se encontra trancado.\n");
+ 	}
+ 	else if (ioctl(fd, TRANCAR) == -1)
+    {
+        perror("Erro no trancamento do cofre");
+    }
+}
+
+int cofreAberto(int fd){
+     int v;
+ 
+    if (ioctl(fd, ESTA_ABERTO, &v) == -1)
+    {
+        perror("Erro no saldo");
+    }
+    else
+    {
+        return v;
+
+    }
+    
+    return 0;
 }
 
 void help(){
-	printf("Help\n");
+	printf("-b -> Utilize para vizualizar o seu saldo (balance).\n");
+	printf("-w -> Utilize para sacar dinheiro do cofre (withdraw).\n");
+	printf("-l -> Utilize para trancar o cofre (lock).\n");
+	printf("-u -> Utilize para destrancar o cofre (unlock).\n");
+	printf("-d -> Utilize para depositar dinheiro no cofre (deposit).\n");
 }
-
-void logout(int fd){
-	//printf("LogOut\n");
-	
-	if (ioctl(fd, ATM_IS_USING) == -1){
-        perror("Caixa eletrônico sem usuários");
-   }
-	
-	else if (ioctl(fd, ATM_LOGOUT) == -1){
-        perror("query_apps ioctl clr");
-   }
-}
-
-void balance(int fd){
-	//printf("Balance\n");
-	
-	account a;
-	
-	if (ioctl(fd, ATM_IS_USING) == -1){
-        perror("Caixa eletrônico sem usuários");
-   }
-	
-	else if (ioctl(fd, ATM_BALANCE, &a) == -1){
-        perror("query_apps ioctl clr");
-   }
-}
-
-void addUser(int fd){
-	printf("AddUser\n");
-}
-
-void addUserWithName(int fd,char* user){
-	printf("%s\n", user);
-}
-
-void loginWithName(int fd,char* user){
-	printf("%s\n", user);
-	
-	if (ioctl(fd, ATM_IS_USING) == -1){
-
-		int password;
-		
-		printf("Entre com a senha: ");
-		scanf("%d", &password);
-			
-		account_user u;
-		
-		strcpy(u.login, user);
-		u.password = password;
-		
-		//printf("%s %d", u.login, u.password);
-		
-		if (ioctl(fd, ATM_AUTHENTICATE_ACCOUNT_USER, &u) == -1)
-	    {
-	        perror("query_apps ioctl set");
-	    }
+ 
+int main(int argc, char *argv[])
+{
+    char *file_name = "/dev/cofre";
+    int fd;
+    enum
+    {
+        depositar,
+        retirar,
+        trancar,
+        abrir,
+        saldo,
+        ajuda
+        
+    } option;
+ 
+    if (argc == 1)
+    {
+        option = ajuda;
     }
-	
-}
-
-void withdraw(int fd,char* value){
-	float v;
-	sscanf(value, "%f", &v);
-	//printf("%.2f\n", v);
-	
-	transaction t;
-	
-	if (ioctl(fd, ATM_IS_USING) == -1){
-        perror("Caixa eletrônico sem usuários");
-   }
-	
-	else if (ioctl(fd, ATM_WITHDRAW, &v) == -1){
-        perror("query_apps ioctl clr");
-   }
-	
-}
-
-void deposit(int fd,char* value){
-	float v;
-	sscanf(value, "%f", &v);
-	//printf("%.2f\n", v);
-	
-	if (ioctl(fd, ATM_IS_USING) == -1){
-        perror("Caixa eletrônico sem usuários");
-   }
-	
-	else if (ioctl(fd, ATM_DEPOSIT, &v) == -1){
-        perror("query_apps ioctl clr");
-   }
-}
-
-void transfer(int fd,char* value, char* destination){
-	float v;
-	sscanf(value, "%f", &v);
-	int d = atoi(destination);
-	//printf("%.2f %d\n", v, d);
-	
-	transaction t;
-
-	t.destination = d;
-	t.value = v;
-	
-	if (ioctl(fd, ATM_IS_USING) == -1){
-        perror("Caixa eletrônico sem usuários");
-   }
-	
-	else if (ioctl(fd, ATM_TRANSFER, &t) == -1){
-        perror("query_apps ioctl clr");
-   }
-}
-
-int main (int argc, char* argv[]){
-	
-	int returnValue = 0;
-	char *file_name = "/dev/ATM";
-   int fd;
-   
-   fd = open(file_name, O_RDWR);
-    if (fd == -1){
-        perror("App Open");
+    else if (argc == 2)
+    {
+        if (strcmp(argv[1], "-d") == 0)
+        {
+            option = depositar;
+        }
+        else if (strcmp(argv[1], "-w") == 0)
+        {
+            option = retirar;
+        }
+        else if (strcmp(argv[1], "-l") == 0)
+        {
+            option = trancar;
+        }
+        else if (strcmp(argv[1], "-u") == 0)
+        {
+            option = abrir;
+        }
+        else if (strcmp(argv[1], "-b") == 0)
+        {
+            option = saldo;
+        }
+        else if (strcmp(argv[1], "-h") == 0)
+        {
+            option = ajuda;
+        }
+        else
+        {
+            fprintf(stderr, "Usage: %s [-d | -w | -l | -u | -b]\n", argv[0]);
+            help();
+            return 1;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "Usage: %s [-d | -w | -l | -u | -b]\n", argv[0]);
+        help();
+        return 1;
+    }
+    fd = open(file_name, O_RDWR);
+    if (fd == -1)
+    {
+        perror("Erro na abertura do modulo");
         return 2;
     }
-	
-	if(argc == 1){
-	
-		login(fd);
-		
-	}else if(argc == 2){
-
-		if (strcmp(argv[1],"-h") == 0){
-			help();
-		}
-		else if (strcmp(argv[1],"-q") == 0){
-			logout(fd);
-		}else if (strcmp(argv[1],"-b") == 0){
-			balance(fd);
-		}else if (strcmp(argv[1],"-a") == 0){
-			addUser(fd);
-		}else{
-			printf("Opção não encontrada\n");
-			help();
-		}
-	
-	}else if(argc == 3){
-
-		if (strcmp(argv[1],"-u") == 0)
-			loginWithName(fd,argv[2]);
-		else if (strcmp(argv[1],"-w") == 0)
-			withdraw(fd,argv[2]);
-		else if (strcmp(argv[1],"-d") == 0)
-			deposit(fd,argv[2]);
-		else if (strcmp(argv[1],"-a") == 0)
-			addUserWithName(fd,argv[2]);
-		else{
-			printf("Opção não encontrada\n");
-			help();
-		}
-	}else if(argc == 4){
-		if (strcmp(argv[1],"-t") == 0)
-			transfer(fd,argv[2], argv[3]);
-		else{
-			printf("Opção não encontrada\n");
-			help();
-		}
-	}
-
-	return returnValue;
-
+ 
+    switch (option)
+    {
+        case depositar:
+            deposito(fd);
+            break;
+        case retirar:
+            saque(fd);
+            break;
+        case saldo:
+            ver_saldo(fd);
+            break;
+        case abrir:
+            abrirCofre(fd);
+            break;
+        case trancar:
+            trancarCofre(fd);
+            break;
+        case ajuda:
+            help();
+            break;
+        default:
+            break;
+    }
+ 
+    close (fd);
+ 
+    return 0;
 }
